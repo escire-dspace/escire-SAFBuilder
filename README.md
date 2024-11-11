@@ -1,125 +1,97 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+# SAFBuilder - Item Packager from CSV (customized by eScire)
 
-    <groupId>safbuilder</groupId>
-    <artifactId>safbuilder</artifactId>
-    <version>1.6</version>
-    <packaging>jar</packaging>
+A tool that turns content files and a metadata spreadsheet into a Simple Archive Format package, which easily allows for batch import to DSpace, an Institutional Repository.
 
-    <name>safbuilder</name>
-    <url>https://github.com/DSpace-Labs/SAFBuilder</url>
+See also: [Wiki entry on Simple Archive Format Packager](https://wiki.duraspace.org/display/DSPACE/Simple+Archive+Format+Packager "Simple Archive Format Package wiki entry")
 
-    <contributors>
-        <contributor>
-            <name>Peter Dietz</name>
-            <url>https://github.com/peterdietz</url>
-        </contributor>
-    </contributors>
+## Similar projects to also consider
+**This SAFBuilder tool is looking for a new maintainer & hasn't received updates in some time.**
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+Other community projects/programs have been developed that also turn a CSV into a Simple Archive Format package. They include:
+* https://github.com/jcreel/SAFCreator
+* https://github.com/isido/saf-archiver
+* https://github.com/lib-uoguelph-ca/dspace-csv-archive
 
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <version>[1.18,)</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>1.5.0</version>
-        </dependency>
-	<dependency>
-	    <groupId>commons-io</groupId>
-	    <artifactId>commons-io</artifactId>
-	    <version>2.17.0</version>
-	</dependency>
-        <dependency>
-            <groupId>commons-vfs</groupId>
-            <artifactId>commons-vfs</artifactId>
-            <version>1.0</version>
-	    <exclusions>
-                <exclusion>
-                    <groupId>commons-io</groupId>
-                    <artifactId>commons-io</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.javacsv</groupId>
-            <artifactId>javacsv</artifactId>
-            <version>2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>xmlwriter</groupId>
-            <artifactId>xmlwriter</artifactId>
-            <version>2.2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.juniversalchardet</groupId>
-            <artifactId>juniversalchardet</artifactId>
-            <version>1.0.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>[4.3.6,)</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>[2.8.11.1,)</version>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>17</source>
-                    <target>17</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>safbuilder.BatchProcess</mainClass>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-</project>
+
+## Installation / Usage
+To Install and generate an ItemImport package:
+
+```bash
+git clone https://github.com/DSpace-Labs/SAFBuilder.git
+cd SAFBuilder
+./safbuilder.sh -c src/sample_data/AAA_batch-metadata.csv -z
+```
+
+Prerequisites:
+
+ * Command line / terminal
+ * Java JDK
+ * Git
+ * Maven
+
+Help Usage (i.e. ./safbuilder.sh --help):
+
+```
+usage: SAFBuilder   
+ -c,--csv <arg>   Filename with path of the CSV spreadsheet. This must be
+                  in the same directory as the content files
+ -h,--help        Display the Help
+ -o,--output-name (optional) Custom folder name for the output directory. Default: "SimpleArchiveFormat"
+ -z,--zip         (optional) ZIP the output
+ ```
+
+
+Input
+-----
+A spreadsheet (.csv) with the following columns:
+* filename for the bitstream/file
+* metadata with namespace.element.(qualifer). Examples would be: dc.description or dc.contributor.author
+![Image of a sample input spreadsheet with metadata](https://user-images.githubusercontent.com/58014/54175778-6e541a00-4462-11e9-9196-c3a3ae76f6e0.png "sample spreadsheet with metadata")
+
+
+Output
+------
+The output is a directory "SimpleArchiveFormat" in the same directory as the CSV. If you specify to have a ZIP file created, it is in the same directory as the CSV, and will be named SimpleArchiveFormat.zip
+```
+SimpleArchiveFormat/
+  item_000/
+      dublin_core.xml         -- qualified Dublin Core metadata for metadata fields belonging to the dc schema
+      metadata_[prefix].xml   -- metadata in another schema, the [prefix] is the short name of the schema as registered with the metadata registry
+      contents                -- text file containing one line per filename
+      file_1.doc              -- files to be added as bitstreams to the item
+      file_2.pdf
+  item_001/
+      dublin_core.xml
+      contents
+      file_1.png
+  item_...
+```
+
+You can then import the SimpleArchiveFormat directory into DSpace as-is (see https://wiki.duraspace.org/display/DSDOC5x/Importing+and+Exporting+Items+via+Simple+Archive+Format for further information). Or you can import the ZIP file into portions of DSpace that enable Batch Import from Zip files.
+
+# eScire customizations
+
+POM.xml updated to use with JAVA 17
+
+## Considerations to execute safbuilder.sh file
+You should execute this file using bash in Ubuntu/Debian if shell is your default system shell because content file is created with bash syntax.
+
+```
+bash ./path/to/file/safbuilder.sh -c src/sample_data/AAA_batch-metadata.csv -z
+```
+
+
+Other Things
+-----
+
+Author: Peter Dietz & DSpace Contributors
+
+Version History:
+
+* Current 
+* v5 (2019-03-12) - Use -o to rename output directory
+* v4 (2016-05-06) - Use -c to specify csv, and -z to indicate to zip the contents
+* v3, v2, v1 - ./safbuilder.sh /path/to/parentDirectory file.csv
+
+Older versions of this tool required a space between the parent directory file path, and the filename of the CSV. The current version combines the path and the filename. It also allows the ability to ZIP the contents.
+
